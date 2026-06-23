@@ -1,0 +1,28 @@
+{
+  "name": "@cmanohar/flow-admin",
+  "version": "0.1.0",
+  "description": "Embeddable admin/triage route for Flow (review findings, set status, toggle runtime flag). Sprint 4 — stub.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "dependencies": {
+    "@cmanohar/flow-core": "0.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0"
+  }
+}

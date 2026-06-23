@@ -1,0 +1,24 @@
+{
+  "name": "flow",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Flow — an embeddable in-app feedback + UAT overlay platform (extracted from SerenityEMR).",
+  "type": "module",
+  "workspaces": [
+    "packages/core",
+    "packages/widget",
+    "packages/server",
+    "packages/admin",
+    "examples/vite-react"
+  ],
+  "scripts": {
+    "build": "npm run build -w @cmanohar/flow-core && npm run build -w @cmanohar/flow-feedback && npm run build -w @cmanohar/flow-server && npm run build -w @cmanohar/flow-admin",
+    "test": "npm run test -w @cmanohar/flow-core && npm run test -w @cmanohar/flow-feedback",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "dev:example": "npm run dev -w @cmanohar/flow-example",
+    "report": "npm run report -w @cmanohar/flow-core"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

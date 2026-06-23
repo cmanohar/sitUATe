@@ -1,0 +1,16 @@
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Local feedback session data (findings + screenshots) — never commit
+flow-sessions/
+flow-data/
+
+# Editor / OS
+.DS_Store
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*

@@ -1,0 +1,41 @@
+/*
+ * Flow self-contained theme.
+ *
+ * Import once in your app:  import '@cmanohar/flow-feedback/styles.css';
+ *
+ * The widget renders correctly in any host because these token defaults are
+ * shipped here, NOT inherited from the host. To re-theme the overlay, redefine
+ * any of the `--flow-*-rgb` variables in your own `:root` (values are
+ * space-separated RGB channels so Tailwind opacity modifiers keep working).
+ */
+:root {
+  --flow-primary-rgb: 79 70 229; /* indigo-600 */
+  --flow-on-primary-rgb: 255 255 255;
+  --flow-surface-rgb: 255 255 255;
+  --flow-surface-container-lowest-rgb: 255 255 255;
+  --flow-surface-container-rgb: 243 244 246; /* gray-100 */
+  --flow-surface-container-high-rgb: 229 231 235; /* gray-200 */
+  --flow-on-surface-rgb: 17 24 39; /* gray-900 */
+  --flow-on-surface-variant-rgb: 107 114 128; /* gray-500 */
+  --flow-outline-variant-rgb: 209 213 219; /* gray-300 */
+}
+
+/*
+ * Tailwind's `ring`/`shadow` utilities reference `--tw-*` custom properties that
+ * are normally initialised by preflight's global `*` reset. We deliberately omit
+ * `@tailwind base` (its global reset would clobber the host), so we seed just
+ * those defaults — scoped to the overlay root. They inherit to every overlay
+ * node, and nothing outside `[data-uat-root]` is touched.
+ */
+[data-uat-root] {
+  --tw-ring-inset: ;
+  --tw-ring-offset-width: 0px;
+  --tw-ring-offset-color: #fff;
+  --tw-ring-color: rgb(59 130 246 / 0.5);
+  --tw-ring-offset-shadow: 0 0 #0000;
+  --tw-ring-shadow: 0 0 #0000;
+  --tw-shadow: 0 0 #0000;
+  --tw-shadow-colored: 0 0 #0000;
+}
+
+@tailwind utilities;
