@@ -11,33 +11,16 @@
  * type-checked anchor.
  */
 
-/** Host-supplied identity. Situate never owns auth. */
-export interface SituateAuthContext {
-  userId: string;
-  displayName?: string;
-  roles: string[];
-  isAdmin: boolean;
-}
-
-/** Triage lifecycle for a finding / feature request. */
-export type SituateFindingStatus =
-  | 'new'
-  | 'triaged'
-  | 'planned'
-  | 'in-progress'
-  | 'shipped'
-  | 'declined'
-  | 'duplicate';
-
-/** Runtime gating config served by the collector and edited in the admin route. */
-export interface SituateGatingConfig {
-  /** Master on/off for this environment. */
-  enabled: boolean;
-  /** Roles permitted to see the widget when enabled (empty = all authenticated). */
-  allowedRoles: string[];
-  /** Explicit user allowlist, in addition to roles. */
-  allowedUserIds: string[];
-}
+/**
+ * The gating/triage contracts now live in `@situate/core` (so the collector's
+ * `StorageAdapter` can reference them without `core` importing `admin`). Re-exported
+ * here unchanged so this package's published contract is stable.
+ */
+export type {
+  SituateAuthContext,
+  SituateFindingStatus,
+  SituateGatingConfig,
+} from '@situate/core';
 
 /** Placeholder until the components land in Sprint 4. */
 export const SITUATE_ADMIN_STATUS = 'planned' as const;

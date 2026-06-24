@@ -6,6 +6,13 @@
  */
 export * from './types.js';
 export * from './constants.js';
+export type {
+  SituateAuthContext,
+  SituateFindingStatus,
+  SituateGatingConfig,
+} from './gating.js';
+export { DEFAULT_GATING_CONFIG } from './gating.js';
+export type { StorageAdapter, ListFindingsQuery } from './storage.js';
 export { buildFinding } from './finding.js';
 export {
   computeSelectorPath,

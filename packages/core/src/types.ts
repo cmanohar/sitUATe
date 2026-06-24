@@ -10,6 +10,8 @@
  * rename is planned.
  */
 
+import type { SituateFindingStatus } from './gating.js';
+
 export type UatCategory = 'bug' | 'change' | 'question';
 
 /** Severity vocabulary matches the repo's review/feedback docs. */
@@ -64,6 +66,7 @@ export interface UatFinding {
   severity: UatSeverity;
   comment: string;
   screenshotFile?: string; // assigned by the transport/collector, not the client
+  status?: SituateFindingStatus; // triage state, collector-managed (defaults to 'new' on ingest)
   appVersion?: string;
   testerRole?: TesterRole;
   userAgent: string;
@@ -72,7 +75,7 @@ export interface UatFinding {
 /** Everything the UI/session gathers before `buildFinding` stamps id/timestamp. */
 export type BuildFindingInput = Omit<
   UatFinding,
-  'id' | 'schemaVersion' | 'timestamp' | 'screenshotFile'
+  'id' | 'schemaVersion' | 'timestamp' | 'screenshotFile' | 'status'
 >;
 
 /** A per-page-load session. */

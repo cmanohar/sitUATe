@@ -1,7 +1,7 @@
 {
   "name": "@situate/server",
   "version": "0.1.0",
-  "description": "Situate collector seed: Vite dev plugin + standalone ingest service. Sprint 2 evolves this into a Fastify service with pluggable storage.",
+  "description": "Situate collector: Fastify ingest service with pluggable storage (files | SQLite), plus the Vite dev plugin (local sink) and a dependency-free standalone collector seed.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -16,7 +16,15 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "collect": "node src/collector.mjs"
+    "test": "vitest run",
+    "collect": "node src/collector.mjs",
+    "serve": "node dist/main.js"
+  },
+  "dependencies": {
+    "@fastify/cors": "^10.0.0",
+    "@situate/core": "0.1.0",
+    "better-sqlite3": "^11.0.0",
+    "fastify": "^5.0.0"
   },
   "peerDependencies": {
     "vite": ">=5"
@@ -25,8 +33,10 @@
     "vite": { "optional": true }
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.0",
     "@types/node": "^20.0.0",
     "typescript": "^5.7.0",
-    "vite": "^6.4.3"
+    "vite": "^6.4.3",
+    "vitest": "^3.0.0"
   }
 }

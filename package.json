@@ -13,7 +13,7 @@
   ],
   "scripts": {
     "build": "npm run build -w @situate/core && npm run build -w @situate/widget && npm run build -w @situate/server && npm run build -w @situate/admin",
-    "test": "npm run test -w @situate/core && npm run test -w @situate/widget",
+    "test": "npm run test -w @situate/core && npm run test -w @situate/widget && npm run test -w @situate/server",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "dev:example": "npm run dev -w @situate/example",
     "report": "npm run report -w @situate/core"
