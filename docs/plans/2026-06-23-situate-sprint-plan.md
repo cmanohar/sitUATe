@@ -1,6 +1,6 @@
 # Situate — Sprint Plan
 
-**Status:** Sprints 1–4 shipped (extraction → collector backend → runtime gating → admin/triage route); Sprint 5 (redaction) remaining · **Date:** 2026-06-23 (updated 2026-06-24) · **Design:** [`../DESIGN.md`](../DESIGN.md)
+**Status:** ✅ **v1 feature-complete** — Sprints 1–5 all shipped (extraction → collector backend → runtime gating → admin/triage route → redaction hardening) · **Date:** 2026-06-23 (updated 2026-06-24) · **Design:** [`../DESIGN.md`](../DESIGN.md)
 
 Two-phase format per house convention: **Phase 1** sizes the backlog and picks sprint shape; **Phase 2** is the per-epic execution deep-dive. IDs: epics `F-EPIC-N`, stories `FS-N`. Effort scale: XS / S / M / L / XL.
 
@@ -10,7 +10,7 @@ Two-phase format per house convention: **Phase 1** sizes the backlog and picks s
 
 ### Where we are
 
-The monorepo (`core` + `widget` + `server` + `admin` + `examples/vite-react`) now carries everything through the admin route. **136 unit tests pass** (32 core / 43 widget / 48 server / 13 admin). Shipped: the Fastify collector with pluggable `StorageAdapter` (Files/SQLite) (Sprint 2, `3297efc`); runtime gating — `situate(config)` resolves `GET /config/:env` against the collector, fail-closed (Sprint 3, `9d2e369`); and the embeddable `SituateAdmin` triage route — findings table, status lifecycle, screenshot viewing, CSV/markdown export, gating editor, behind a server-enforced admin token (Sprint 4, `aabf4d2`). **Only redaction hardening (Sprint 5) remains** before v1.
+The monorepo (`core` + `widget` + `server` + `admin` + `examples/vite-react`) is **v1 feature-complete**. **144 unit tests pass** (40 core / 43 widget / 48 server / 13 admin). Shipped: the Fastify collector with pluggable `StorageAdapter` (Files/SQLite) (Sprint 2, `3297efc`); runtime gating — `situate(config)` resolves `GET /config/:env`, fail-closed (Sprint 3, `9d2e369`); the embeddable `SituateAdmin` triage route — findings table, status lifecycle, screenshot viewing, CSV/markdown export, gating editor, behind a server-enforced admin token (Sprint 4, `aabf4d2`); and always-on best-effort screenshot redaction (Sprint 5, `a711c9f`) — masked paint verified live in the example host. Remaining items are all post-v1 backlog (B1–B5).
 
 ### Candidate items
 
@@ -22,7 +22,7 @@ The backend is the **keystone**: runtime gating, the allowlist, the admin route,
 | **F2** | Collector backend (Fastify + StorageAdapter) | Ingest + flag/allowlist config + admin query APIs; files + SQLite adapters. | **DONE** (`3297efc`) |
 | **F3** | Runtime gating + auth context | Widget resolves flag/allowlist via `SituateAuthContext`; fail-closed prod. | **DONE** (`9d2e369`) |
 | **F4** | Embeddable admin/triage route | Findings table, status, export, flag+allowlist toggle (host auth, `isAdmin`). Free-form tags deferred. | **DONE** (`aabf4d2`) |
-| **F5** | Redaction hardening | Always-on mask of `data-uat-redact` + inputs + configured selectors; disable-screenshots switch; residual-risk docs. | M (next) |
+| **F5** | Redaction hardening | Always-on mask of `data-uat-redact` + inputs + configured selectors; disable-screenshots switch; residual-risk docs. | **DONE** (`a711c9f`) |
 | **F6** | Feature-request triage model | `SituateFindingStatus` lifecycle, category surfacing, CSV/markdown export. | **DONE** (`aabf4d2`, with F4) |
 | **B1** | Postgres adapter | Production-grade store beyond SQLite. | M |
 | **B2** | ~~Internal `Uat*` → `Situate*` rename~~ | Dropped — `Uat*` reads as the **UAT** inside sit·UAT·e; retained intentionally. | — |
@@ -36,7 +36,7 @@ The backend is the **keystone**: runtime gating, the allowlist, the admin route,
 - **Sprint 2 — Collector backend (keystone) (DONE — `3297efc`):** F2.
 - **Sprint 3 — Runtime gating + auth (DONE — `9d2e369`):** F3.
 - **Sprint 4 — Admin/triage route (DONE — `aabf4d2`):** F4 + F6.
-- **Sprint 5 — Redaction hardening (next):** F5.
+- **Sprint 5 — Redaction hardening (DONE — `a711c9f`):** F5.
 - **Deferred (post-v1 backlog):** B1–B5.
 
 ### Decisions needed before kickoff
@@ -135,20 +135,22 @@ The backend is the **keystone**: runtime gating, the allowlist, the admin route,
 
 ---
 
-### F-EPIC-5 — Redaction hardening
+### F-EPIC-5 — Redaction hardening ✅ Implemented (2026-06-24, `a711c9f`)
 
-**Parent sprint:** Sprint 5 · **Status:** ❌ Not started · **Effort:** M
+**Parent sprint:** Sprint 5 · **Status:** ✅ Shipped · **Effort:** M
 
 **Governing decisions:** D7 (always-on redaction; disable-able; residual risk).
 
-**Execution order:**
-- **Step 1 (FS-20):** Redaction pass in `core/capture` — mask `[data-uat-redact]`, all inputs, and `options.redactSelectors[]` before PNG; blank redacted `textSnippet`. *(test-first against a DOM fixture)*
-- **Step 2 (FS-21):** `captureScreenshots: false` deployment switch (metadata-only feedback).
-- **Step 3 (FS-22):** Document residual risk + host responsibilities; add a host-integration checklist (note: add the appropriate safeguard before enabling screenshots in production).
+**Execution order (all done):**
+- **Step 1 (FS-20):** ✅ Redaction pass in `core/redaction.ts`, applied in `capture.ts` — masks `[data-uat-redact]`, all form fields, and `redactSelectors` before the PNG, then restores the DOM; `selector.ts` blanks `textSnippet` for redacted elements. *(test-first — pure helpers unit-tested; paint live)*
+- **Step 2 (FS-21):** ✅ `situate({ captureScreenshots: false })` deployment switch → metadata-only feedback (threaded through `useUatSession`).
+- **Step 3 (FS-22):** ✅ DESIGN §Redaction rewritten (shipped state + named residual risk + a **host-integration checklist**); CLAUDE.md + example caption updated.
 
-**File checklist:** `packages/core/src/{capture.ts,redaction.ts}`, `packages/widget/src/index.ts` (options), `docs/DESIGN.md` (§Redaction), tests under `packages/core/test/`.
+**Implementation note:** masking is hybrid — form controls (can't host children) get solid-bg + transparent-text; other regions get a solid cover overlay so descendant images/text don't reach the raster. Applied to the live DOM for the brief capture window, then reverted (named in the residual-risk section).
 
-**Exit criteria:** marked regions + inputs are masked in a live capture; screenshots can be disabled per deployment; residual-risk + checklist documented.
+**Shipped files:** `packages/core/src/{redaction.ts (new),capture.ts,selector.ts,index.ts}`; `packages/widget/src/{gating.ts,UatRoot.tsx,useUatSession.ts}`; `docs/DESIGN.md`, `CLAUDE.md`, `examples/vite-react/src/App.tsx`. Tests: `packages/core/test/redaction.test.ts` (+8).
+
+**Exit criteria — all met:** ✅ marked regions + form fields masked in a **live capture** (paint-verified in the example host: the `[data-uat-redact]` card is 100% mask color `rgb(17,24,39)` in the captured PNG; the unmarked card is not); ✅ screenshots disable-able per deployment; ✅ residual-risk + checklist documented.
 
 ---
 
