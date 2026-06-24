@@ -30,6 +30,11 @@ export interface StorageAdapter {
    * (never client-supplied — path-traversal guard lives here).
    */
   saveScreenshot(findingId: string, png: Buffer): Promise<string>;
+  /**
+   * Read a screenshot's bytes by its (server-generated) filename, or `null` if
+   * unknown. Goes through the adapter so the HTTP layer never assumes disk storage.
+   */
+  readScreenshot(filename: string): Promise<Buffer | null>;
   /** List findings newest-first, filtered by the query. */
   listFindings(query: ListFindingsQuery): Promise<UatFinding[]>;
   /** Set a finding's triage status. */

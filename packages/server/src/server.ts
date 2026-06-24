@@ -21,6 +21,8 @@ export interface BuildServerOptions {
   allowedOrigin?: string;
   /** If set, ingest requires a matching `x-situate-token` header. */
   ingestToken?: string;
+  /** If set, admin routes require a matching `x-situate-admin-token`. Set in production. */
+  adminToken?: string;
   bodyLimit?: number;
   logger?: boolean;
 }
@@ -37,7 +39,11 @@ export async function buildServer(opts: BuildServerOptions): Promise<FastifyInst
     allowedHeaders: ['Content-Type', 'x-situate-token'],
   });
 
-  const ctx: ServerContext = { adapter: opts.adapter, ingestToken: opts.ingestToken };
+  const ctx: ServerContext = {
+    adapter: opts.adapter,
+    ingestToken: opts.ingestToken,
+    adminToken: opts.adminToken,
+  };
   registerHealthRoutes(app);
   registerFeedbackRoutes(app, ctx);
   registerConfigRoutes(app, ctx);

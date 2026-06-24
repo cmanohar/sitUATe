@@ -6,10 +6,11 @@
  * Uses `better-sqlite3` (synchronous, battle-tested). Node floor is >=18, so the
  * built-in `node:sqlite` (Node 22+, experimental) is intentionally not used.
  */
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import Database from 'better-sqlite3';
+import { isSafeFilename } from './files.js';
 import {
   DEFAULT_GATING_CONFIG,
   type ListFindingsQuery,
@@ -72,6 +73,12 @@ export class SqliteAdapter implements StorageAdapter {
     const filename = `${randomUUID()}.png`;
     writeFileSync(resolve(this.shotsDir, filename), png);
     return filename;
+  }
+
+  async readScreenshot(filename: string): Promise<Buffer | null> {
+    if (!isSafeFilename(filename)) return null;
+    const file = resolve(this.shotsDir, filename);
+    return existsSync(file) ? readFileSync(file) : null;
   }
 
   async listFindings(query: ListFindingsQuery): Promise<UatFinding[]> {

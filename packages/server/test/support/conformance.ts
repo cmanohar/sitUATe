@@ -72,6 +72,16 @@ export function runStorageAdapterConformance(
       expect(name).not.toContain('..');
     });
 
+    it('reads a saved screenshot back by filename, null for unknown/unsafe names', async () => {
+      const a = await makeAdapter();
+      const name = await a.saveScreenshot('finding-x', TINY_PNG);
+      const bytes = await a.readScreenshot(name);
+      expect(bytes).not.toBeNull();
+      expect(Buffer.compare(bytes as Buffer, TINY_PNG)).toBe(0);
+      expect(await a.readScreenshot('does-not-exist.png')).toBeNull();
+      expect(await a.readScreenshot('../../etc/passwd')).toBeNull(); // traversal rejected
+    });
+
     it('updates a finding status via setStatus', async () => {
       const a = await makeAdapter();
       const f = makeFinding({ status: 'new' });

@@ -1,26 +1,35 @@
 /**
- * @situate/admin — embeddable admin/triage route for Situate.  [Sprint 4 — stub]
+ * @situate/admin — embeddable admin/triage route for Situate (Sprint 4).
  *
- * Will export React components a host mounts at e.g. `/admin/feedback`:
- *   - a findings/feature-request triage table (filter, tag, set status, export)
- *   - the runtime flag + role-allowlist toggle (writes to the collector's config API)
+ * React components a host mounts behind its own routing (e.g. `/admin/feedback`):
+ *   - `SituateAdmin` — the triage route: findings table (filter, set status, view
+ *     screenshots, export CSV/markdown) + the runtime gating editor.
+ *   - `FindingsTable`, `GatingEditor` — reusable primitives.
+ *   - `useFindings` + the `client`/`export` helpers — for custom admin surfaces.
  *
- * The host supplies identity via an AuthContext (NO identity provider is baked
- * in — see docs/DESIGN.md §Auth). The shapes below are the contract those
- * components will consume; they are published now so the design has a concrete,
- * type-checked anchor.
+ * The host supplies identity via `SituateAuthContext` (NO identity provider is
+ * baked in — see docs/DESIGN.md §Auth). The route renders only for `isAdmin`, and
+ * the collector enforces the admin token server-side.
  */
 
-/**
- * The gating/triage contracts now live in `@situate/core` (so the collector's
- * `StorageAdapter` can reference them without `core` importing `admin`). Re-exported
- * here unchanged so this package's published contract is stable.
- */
+// Gating/triage contracts live in `@situate/core` (so the collector's StorageAdapter
+// can reference them without core→admin coupling); re-exported here unchanged.
 export type {
   SituateAuthContext,
   SituateFindingStatus,
   SituateGatingConfig,
 } from '@situate/core';
 
-/** Placeholder until the components land in Sprint 4. */
-export const SITUATE_ADMIN_STATUS = 'planned' as const;
+export { SituateAdmin, type SituateAdminProps } from './SituateAdmin.js';
+export { FindingsTable, STATUSES, type FindingsTableProps } from './FindingsTable.js';
+export { GatingEditor, type GatingEditorProps } from './GatingEditor.js';
+export { useFindings, type UseFindings } from './useFindings.js';
+export {
+  listFindings,
+  setStatus,
+  getConfig,
+  setConfig,
+  fetchScreenshot,
+  type AdminClientOptions,
+} from './client.js';
+export { findingsToCsv, findingsToMarkdown, downloadText } from './export.js';

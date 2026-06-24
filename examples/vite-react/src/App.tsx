@@ -7,6 +7,8 @@
  * `data-uat-redact` marks a region that Situate's always-on redaction will mask in
  * screenshots (Sprint 5) — useful for any field that could carry sensitive data.
  */
+import { SituateAdmin } from '@situate/admin';
+
 const page: React.CSSProperties = {
   fontFamily: 'ui-sans-serif, system-ui, sans-serif',
   maxWidth: 720,
@@ -14,6 +16,26 @@ const page: React.CSSProperties = {
   padding: '48px 24px',
   color: '#111827',
 };
+
+/**
+ * Demo wiring of the embeddable admin route (Sprint 4). Visit `?admin` to mount it.
+ * The host owns identity — here a hard-coded admin; a real host would pass its
+ * logged-in user and only hand `adminToken` to authenticated admins. Point it at a
+ * running Fastify collector via VITE_SITUATE_COLLECTOR_URL.
+ */
+function AdminRoute() {
+  const collectorUrl = import.meta.env.VITE_SITUATE_COLLECTOR_URL ?? 'http://localhost:8080';
+  return (
+    <main style={page}>
+      <SituateAdmin
+        auth={{ userId: 'demo-admin', displayName: 'Demo Admin', roles: ['admin'], isAdmin: true }}
+        collectorUrl={collectorUrl}
+        adminToken={import.meta.env.VITE_SITUATE_ADMIN_TOKEN}
+        environment="production"
+      />
+    </main>
+  );
+}
 
 const card: React.CSSProperties = {
   border: '1px solid #e5e7eb',
@@ -23,6 +45,10 @@ const card: React.CSSProperties = {
 };
 
 export function App() {
+  // Tiny router: `?admin` mounts the triage route; otherwise the demo page.
+  if (typeof window !== 'undefined' && window.location.search.includes('admin')) {
+    return <AdminRoute />;
+  }
   return (
     <main style={page}>
       <h1 style={{ fontSize: 28, fontWeight: 700 }}>Situate — example host</h1>

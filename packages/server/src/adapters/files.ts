@@ -85,6 +85,12 @@ export class FilesAdapter implements StorageAdapter {
     return filename;
   }
 
+  async readScreenshot(filename: string): Promise<Buffer | null> {
+    if (!isSafeFilename(filename)) return null;
+    const file = resolve(this.dir, 'shots', filename);
+    return existsSync(file) ? readFileSync(file) : null;
+  }
+
   async listFindings(query: ListFindingsQuery): Promise<UatFinding[]> {
     const all = this.allFindingFiles().flatMap(({ file }) => readJsonl(file));
     return all
@@ -120,6 +126,11 @@ export class FilesAdapter implements StorageAdapter {
   async setGatingConfig(env: string, cfg: SituateGatingConfig): Promise<void> {
     writeFileSync(this.configFile(env), JSON.stringify(cfg, null, 2));
   }
+}
+
+/** A bare server-generated filename — no path separators or traversal. */
+export function isSafeFilename(name: string): boolean {
+  return /^[A-Za-z0-9._-]+$/.test(name) && !name.includes('..');
 }
 
 /** Status exact-match + inclusive date-window on the timestamp's date. */

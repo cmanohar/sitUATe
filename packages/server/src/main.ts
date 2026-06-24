@@ -7,7 +7,8 @@
  *   SITUATE_STORAGE_DIR    storage root (default ./.situate/data)
  *   SITUATE_SQLITE_PATH    SQLite file (default <storage>/situate.db)
  *   SITUATE_ALLOWED_ORIGIN CORS origin (default *)
- *   SITUATE_INGEST_TOKEN   if set, require matching `x-situate-token`
+ *   SITUATE_INGEST_TOKEN   if set, require matching `x-situate-token` on ingest
+ *   SITUATE_ADMIN_TOKEN    if set, require matching `x-situate-admin-token` on admin routes
  *
  * Run with `npm run serve` (after build). `/healthz` backs the container healthcheck.
  */
@@ -35,6 +36,7 @@ async function main(): Promise<void> {
     adapter: makeAdapter(),
     allowedOrigin: process.env.SITUATE_ALLOWED_ORIGIN,
     ingestToken: process.env.SITUATE_INGEST_TOKEN || undefined,
+    adminToken: process.env.SITUATE_ADMIN_TOKEN || undefined,
     logger: true,
   });
   await app.listen({ port: PORT, host: '0.0.0.0' });

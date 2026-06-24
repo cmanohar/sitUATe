@@ -6,7 +6,7 @@ import { makeFinding, TINY_PNG } from './support/fixtures.js';
 
 let app: FastifyInstance | undefined;
 
-async function start(opts: { ingestToken?: string } = {}) {
+async function start(opts: { ingestToken?: string; adminToken?: string } = {}) {
   const adapter = new InMemoryAdapter();
   app = await buildServer({ adapter, ...opts });
   await app.ready();
@@ -103,5 +103,45 @@ describe('routes', () => {
     expect(all.json()).toHaveLength(2);
     const shipped = await app.inject({ method: 'GET', url: '/findings?status=shipped' });
     expect(shipped.json()).toHaveLength(0);
+  });
+
+  it('PUT /findings/:id/status updates status; 404 for unknown', async () => {
+    const { app } = await start();
+    await app.inject({ method: 'POST', url: '/uat/feedback', payload: { finding: makeFinding({ id: 'x' }) } });
+    const ok = await app.inject({ method: 'PUT', url: '/findings/x/status', payload: { status: 'triaged' } });
+    expect(ok.statusCode).toBe(200);
+    const list = await app.inject({ method: 'GET', url: '/findings?status=triaged' });
+    expect(list.json().map((f: { id: string }) => f.id)).toEqual(['x']);
+    const missing = await app.inject({ method: 'PUT', url: '/findings/nope/status', payload: { status: 'triaged' } });
+    expect(missing.statusCode).toBe(404);
+  });
+
+  it('GET /shots/:filename returns PNG bytes; 404 for unknown', async () => {
+    const { app } = await start();
+    const post = await app.inject({
+      method: 'POST',
+      url: '/uat/feedback',
+      payload: { finding: makeFinding({ id: 's' }), pngBase64: TINY_PNG.toString('base64') },
+    });
+    const file = post.json().screenshotFile as string;
+    const shot = await app.inject({ method: 'GET', url: `/shots/${file}` });
+    expect(shot.statusCode).toBe(200);
+    expect(shot.headers['content-type']).toContain('image/png');
+    const missing = await app.inject({ method: 'GET', url: '/shots/nope.png' });
+    expect(missing.statusCode).toBe(404);
+  });
+
+  it('admin routes require the admin token when configured; GET /config stays open', async () => {
+    const { app } = await start({ adminToken: 'admin-secret' });
+    // open: widget gating read
+    expect((await app.inject({ method: 'GET', url: '/config/production' })).statusCode).toBe(200);
+    // guarded without token
+    expect((await app.inject({ method: 'GET', url: '/findings' })).statusCode).toBe(401);
+    expect(
+      (await app.inject({ method: 'PUT', url: '/config/staging', payload: { enabled: true, allowedRoles: [], allowedUserIds: [] } })).statusCode,
+    ).toBe(401);
+    // guarded with token
+    const headers = { 'x-situate-admin-token': 'admin-secret' };
+    expect((await app.inject({ method: 'GET', url: '/findings', headers })).statusCode).toBe(200);
   });
 });

@@ -27,6 +27,10 @@ export class InMemoryAdapter implements StorageAdapter {
     return filename;
   }
 
+  async readScreenshot(filename: string): Promise<Buffer | null> {
+    return this.screenshots.get(filename) ?? null;
+  }
+
   async listFindings(query: ListFindingsQuery): Promise<UatFinding[]> {
     return [...this.findings.values()]
       .filter((f) => matchesQuery(f, query))
