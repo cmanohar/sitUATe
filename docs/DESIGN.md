@@ -113,6 +113,8 @@ Consumers either `import '@cmanohar/flow-feedback/styles.css'` (no Tailwind requ
 
 ## PHI & redaction (D7) — including residual risk
 
+> **Current state (v0.1):** redaction is **not yet implemented** — screenshots are captured **as-is, unredacted** (parity with the original SerenityEMR overlay). Redaction is F-EPIC-5 (Sprint 5). Until it lands, keep `captureScreenshots` off, or run the overlay only against dev/clone (non-PHI) data. The behaviour below is the *target* design.
+
 - **Always-on by default.** Before any screenshot is produced, the capture step masks: elements marked `[data-uat-redact]`, all form inputs (`input`/`textarea`/`select`/`[contenteditable]`), and any host-configured selectors. Captured `textSnippet` metadata is stripped/blanked for redacted regions.
 - **Screenshots are disable-able** per deployment (metadata-only feedback). Belt-and-suspenders for the EHR case.
 - **Server-generated filenames** only — client never supplies screenshot paths (path-traversal safe). Offline retry queue holds metadata only, never base64 images.
