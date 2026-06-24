@@ -12,8 +12,18 @@ createRoot(document.getElementById('root')!).render(
   </StrictMode>,
 );
 
-// Build-time gate (default on for the example). In a real app:
-//   if (import.meta.env.VITE_SITUATE_ENABLED === 'true') situate();
+// Two-layer gating (Sprint 3):
+//   • Build-time flag → dead-code-eliminates the overlay when off (kept here).
+//   • Runtime → situate(config) consults the collector and matches the user against
+//     the allowlist; fail-closed in non-dev. This example runs dev mode (no
+//     collectorUrl), so the overlay stays on and posts to the Vite sink.
+//
+// A real, collector-backed host would pass identity + env:
+//   situate({
+//     collectorUrl: import.meta.env.VITE_SITUATE_COLLECTOR_URL,
+//     auth: { userId: me.id, roles: me.roles, isAdmin: me.isAdmin },
+//     environment: import.meta.env.MODE,
+//   });
 if (import.meta.env.VITE_SITUATE_ENABLED !== 'false') {
-  situate();
+  situate({ collectorUrl: import.meta.env.VITE_SITUATE_COLLECTOR_URL });
 }

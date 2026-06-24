@@ -100,7 +100,25 @@ interface TransportConfig { collectorUrl?: string; fetchImpl?: typeof fetch; }
 3. **Fail-closed:** any error, missing config, or absent collector in a non-dev environment → overlay does not render. Dev mode (no `collectorUrl`) stays on for local UAT.
 4. The embedded admin route (D4) edits the config via the collector's config API — flips on/off and edits the allowlist **without a redeploy**.
 
-Until Sprint 3 lands, gating remains **build-time** (`VITE_SITUATE_ENABLED`), exactly as the extracted overlay ships today.
+**Sprint 3 — shipped.** `situate(config)` takes `{ collectorUrl, auth: SituateAuthContext, environment }`. On mount it `GET`s `/config/:env` from the collector and renders only when `enabled` **and** the user matches (empty allowlist = all authenticated; otherwise a role **or** user-id match). Any failure → fail-closed (hidden). Implementation: `packages/widget/src/gating.ts` (`resolveGating`/`userPasses`/`useGating`), gated in `UatRoot`.
+
+**Migration from build-time-only gating.** The two layers compose — keep the build flag for dead-code elimination, add config for the runtime decision:
+
+```ts
+// before (build-time only):
+if (import.meta.env.VITE_SITUATE_ENABLED === 'true') situate();
+
+// after (build flag still tree-shakes; runtime gate + allowlist decide render):
+if (import.meta.env.VITE_SITUATE_ENABLED === 'true') {
+  situate({
+    collectorUrl: import.meta.env.VITE_SITUATE_COLLECTOR_URL,
+    auth: { userId, roles, isAdmin },
+    environment: import.meta.env.MODE,
+  });
+}
+```
+
+Calling `situate()` with no `collectorUrl` is **dev mode** — unchanged behavior, overlay stays on and posts to the Vite sink. Mounting is always safe: a denied decision renders nothing, so a host may call `situate()` unconditionally and let runtime gating decide.
 
 ## Styling decoupling
 

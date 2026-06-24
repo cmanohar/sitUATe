@@ -5,6 +5,7 @@ import { UatToolbar } from './UatToolbar.js';
 import { ElementPicker } from './ElementPicker.js';
 import { CommentPopover, type CommentDraft } from './CommentPopover.js';
 import { useUatSession } from './useUatSession.js';
+import { useGating, type SituateConfig } from './gating.js';
 
 interface Selection {
   scope: UatScope;
@@ -13,8 +14,10 @@ interface Selection {
 }
 
 /** Top-level overlay: owns select-mode + draft state, wires the child widgets. */
-export function UatRoot() {
-  const { count, submit } = useUatSession();
+export function UatRoot({ config = {} }: { config?: SituateConfig }) {
+  // Runtime gating (D5): resolve on mount; render nothing until allowed. Fail-closed.
+  const decision = useGating(config);
+  const { count, submit } = useUatSession({ collectorUrl: config.collectorUrl });
   const [selectMode, setSelectMode] = useState(false);
   const [selection, setSelection] = useState<Selection | null>(null);
   const [saving, setSaving] = useState(false);
@@ -51,6 +54,9 @@ export function UatRoot() {
     },
     [selection, submit],
   );
+
+  // Gate the entire overlay: pending or denied renders nothing (fail-closed).
+  if (decision !== 'allowed') return null;
 
   return (
     <>

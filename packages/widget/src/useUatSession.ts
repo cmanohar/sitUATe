@@ -43,12 +43,17 @@ function situateEnv(): Record<string, string | undefined> {
   }
 }
 
-function transportConfig(): TransportConfig {
-  return { collectorUrl: situateEnv().VITE_SITUATE_COLLECTOR_URL || undefined };
+/** Collector URL from explicit config (Sprint 3) falling back to the build-time env var. */
+function collectorUrl(override?: string): string | undefined {
+  return override || situateEnv().VITE_SITUATE_COLLECTOR_URL || undefined;
 }
 
-function environment(): UatEnvironment {
-  return situateEnv().VITE_SITUATE_COLLECTOR_URL ? 'clone' : 'local';
+function transportConfig(override?: string): TransportConfig {
+  return { collectorUrl: collectorUrl(override) };
+}
+
+function environment(override?: string): UatEnvironment {
+  return collectorUrl(override) ? 'clone' : 'local';
 }
 
 function testerRole(): TesterRole | undefined {
@@ -62,7 +67,8 @@ function testerRole(): TesterRole | undefined {
  * finding) is unit-tested in isolation in @situate/core; this hook just
  * composes them.
  */
-export function useUatSession() {
+export function useUatSession(opts: { collectorUrl?: string } = {}) {
+  const url = opts.collectorUrl;
   const [route, setRoute] = useState(getCurrentRoute());
   const [count, setCount] = useState(0);
   const sessionId = useRef<string>();
@@ -71,14 +77,14 @@ export function useUatSession() {
   useEffect(() => {
     const cleanup = installLocationTracking(() => setRoute(getCurrentRoute()));
     // Best-effort flush of anything queued from a previous offline session.
-    void flushQueue(transportConfig());
+    void flushQueue(transportConfig(url));
     return cleanup;
-  }, []);
+  }, [url]);
 
   const submit = useCallback(async (input: SubmitInput) => {
     const finding = buildFinding({
       sessionId: sessionId.current!,
-      environment: environment(),
+      environment: environment(url),
       scope: input.scope,
       route: getCurrentRoute(),
       url: window.location.href,
@@ -101,10 +107,10 @@ export function useUatSession() {
         ? await captureElement(input.element)
         : await captureViewport();
 
-    const result = await submitFinding(finding, png, transportConfig());
+    const result = await submitFinding(finding, png, transportConfig(url));
     setCount((c) => c + 1);
     return result;
-  }, []);
+  }, [url]);
 
-  return { route, count, environment: environment(), submit };
+  return { route, count, environment: environment(url), submit };
 }
