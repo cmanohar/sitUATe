@@ -131,13 +131,21 @@ Consumers either `import '@situate/widget/styles.css'` (no Tailwind required) or
 
 ## Redaction & sensitive data (D7) — including residual risk
 
-> **Current state (v0.1):** redaction is **not yet implemented** — screenshots are captured **as-is, unredacted** (parity with the original internal overlay). Redaction is F-EPIC-5 (Sprint 5). Until it lands, keep `captureScreenshots` off, or run the overlay only against dev/clone (non-sensitive) data. The behaviour below is the *target* design.
+> **Current state (Sprint 5 — shipped):** always-on, best-effort redaction is **implemented** (`packages/core/src/redaction.ts`, applied in `capture.ts`). The pure helpers are unit-tested; the masked paint is verified live (jsdom has no layout engine).
 
-- **Always-on by default.** Before any screenshot is produced, the capture step masks: elements marked `[data-uat-redact]`, all form inputs (`input`/`textarea`/`select`/`[contenteditable]`), and any host-configured selectors. Captured `textSnippet` metadata is stripped/blanked for redacted regions.
-- **Screenshots are disable-able** per deployment (metadata-only feedback). Belt-and-suspenders for the sensitive-data case.
-- **Server-generated filenames** only — client never supplies screenshot paths (path-traversal safe). Offline retry queue holds metadata only, never base64 images.
+- **Always-on by default.** Before any screenshot is produced, the capture step masks elements marked `[data-uat-redact]`, all form fields (`input`/`textarea`/`select`/`[contenteditable]`), and any host-configured `redactSelectors`, then restores the DOM. Form controls get a solid background + transparent text; other regions get a solid cover overlay (so descendant images/text don't reach the raster). Captured `textSnippet` metadata is blanked for elements inside a redacted region.
+- **Screenshots are disable-able** per deployment via `situate({ captureScreenshots: false })` → metadata-only feedback. Belt-and-suspenders for the sensitive-data case.
+- **Server-generated filenames** only — client never supplies screenshot paths (path-traversal safe). Offline retry queue holds metadata only, never base64 images. Admin screenshot reads also reject traversal and go through the adapter.
 
-> **Residual risk (named).** Best-effort masking is **not** a guarantee that zero sensitive data ever reaches a screenshot — a screen could expose sensitive data outside any marked region. Mitigations the host must own: disciplined `data-uat-redact` annotation, the option to disable screenshots entirely, and restricting prod gating to a trusted allowlist (D5). **If Situate is ever pointed at a live digital health application in production, that consuming app must add the appropriate safeguard + control before enabling screenshots** — Situate surfaces the capability; the consuming app's compliance process governs its use.
+> **Residual risk (named).** Best-effort masking is **not** a guarantee that zero sensitive data ever reaches a screenshot — a screen could expose sensitive data outside any marked region, and masking is applied to the live DOM for the brief capture window. Mitigations the host must own: disciplined `data-uat-redact` annotation, the option to disable screenshots entirely, and restricting prod gating to a trusted allowlist (D5). **If Situate is ever pointed at a live digital health application in production, that consuming app must add the appropriate safeguard + control before enabling screenshots** — Situate surfaces the capability; the consuming app's compliance process governs its use.
+
+### Host-integration checklist (before enabling screenshots in production)
+
+1. **Mark sensitive regions** with `data-uat-redact` (and pass any dynamic ones via `redactSelectors`). All form fields are masked automatically.
+2. **Decide screenshots on/off per environment** — start with `captureScreenshots: false` (metadata-only) and enable only after reviewing what a capture exposes on your screens.
+3. **Lock down gating** — set a real `SITUATE_ADMIN_TOKEN`, keep the collector behind host auth / network isolation, and restrict the prod allowlist (D5) to trusted reviewers.
+4. **Verify masking on your real screens** (paint is environment-specific) before turning capture on against any data that could be sensitive.
+5. **Apply your own compliance safeguard** — Situate provides the controls; your process governs their use.
 
 ## Feature-request model (v1, D8)
 

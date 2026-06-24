@@ -67,8 +67,12 @@ function testerRole(): TesterRole | undefined {
  * finding) is unit-tested in isolation in @situate/core; this hook just
  * composes them.
  */
-export function useUatSession(opts: { collectorUrl?: string } = {}) {
+export function useUatSession(
+  opts: { collectorUrl?: string; redactSelectors?: string[]; captureScreenshots?: boolean } = {},
+) {
   const url = opts.collectorUrl;
+  const redactSelectors = opts.redactSelectors;
+  const captureOff = opts.captureScreenshots === false;
   const [route, setRoute] = useState(getCurrentRoute());
   const [count, setCount] = useState(0);
   const sessionId = useRef<string>();
@@ -96,21 +100,25 @@ export function useUatSession(opts: { collectorUrl?: string } = {}) {
       severity: input.severity,
       comment: input.comment,
       category: input.category,
-      selector: input.element ? extractElementMeta(input.element) : undefined,
+      selector: input.element
+        ? extractElementMeta(input.element, { redactSelectors })
+        : undefined,
       boundingBox: input.box,
       testerRole: testerRole(),
       userAgent: navigator.userAgent,
     });
 
-    const png =
-      input.scope === 'element' && input.element
-        ? await captureElement(input.element)
-        : await captureViewport();
+    // captureScreenshots:false → metadata-only feedback (no PNG produced).
+    const png = captureOff
+      ? undefined
+      : input.scope === 'element' && input.element
+        ? await captureElement(input.element, { redactSelectors })
+        : await captureViewport({ redactSelectors });
 
     const result = await submitFinding(finding, png, transportConfig(url));
     setCount((c) => c + 1);
     return result;
-  }, [url]);
+  }, [url, captureOff, redactSelectors]);
 
   return { route, count, environment: environment(url), submit };
 }

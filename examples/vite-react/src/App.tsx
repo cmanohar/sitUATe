@@ -4,8 +4,9 @@
  * "Note this screen". Saved feedback lands in `.situate/sessions/` via the dev
  * collector plugin.
  *
- * `data-uat-redact` marks a region that Situate's always-on redaction will mask in
- * screenshots (Sprint 5) — useful for any field that could carry sensitive data.
+ * `data-uat-redact` marks a region that Situate's always-on redaction masks in
+ * screenshots — useful for any field that could carry sensitive data. Form fields
+ * are masked automatically; pass extra selectors via situate({ redactSelectors }).
  */
 import { SituateAdmin } from '@situate/admin';
 
@@ -68,8 +69,8 @@ export function App() {
       <section style={card} data-uat-redact>
         <h2 style={{ fontSize: 18, fontWeight: 600 }}>Sensitive region (redaction demo)</h2>
         <p style={{ marginTop: 8 }}>
-          This block is marked <code>data-uat-redact</code>. Situate's always-on redaction (Sprint 5)
-          will mask it before any screenshot is produced.
+          This block is marked <code>data-uat-redact</code>. Situate's always-on redaction
+          masks it before any screenshot is produced.
         </p>
       </section>
     </main>

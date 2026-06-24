@@ -15,6 +15,10 @@ export interface SituateConfig {
   auth?: SituateAuthContext;
   /** Deploy env name for the config lookup (`GET /config/:env`). Default `'production'`. */
   environment?: string;
+  /** Extra selectors to mask in screenshots (always-on: `[data-uat-redact]` + form fields). */
+  redactSelectors?: string[];
+  /** Capture screenshots at all. Default `true`; `false` → metadata-only feedback (D7). */
+  captureScreenshots?: boolean;
 }
 
 export type GatingDecision = 'pending' | 'allowed' | 'denied';

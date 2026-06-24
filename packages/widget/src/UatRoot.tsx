@@ -17,7 +17,11 @@ interface Selection {
 export function UatRoot({ config = {} }: { config?: SituateConfig }) {
   // Runtime gating (D5): resolve on mount; render nothing until allowed. Fail-closed.
   const decision = useGating(config);
-  const { count, submit } = useUatSession({ collectorUrl: config.collectorUrl });
+  const { count, submit } = useUatSession({
+    collectorUrl: config.collectorUrl,
+    redactSelectors: config.redactSelectors,
+    captureScreenshots: config.captureScreenshots,
+  });
   const [selectMode, setSelectMode] = useState(false);
   const [selection, setSelection] = useState<Selection | null>(null);
   const [saving, setSaving] = useState(false);

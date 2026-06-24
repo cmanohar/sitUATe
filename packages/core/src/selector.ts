@@ -1,4 +1,5 @@
 import type { BoundingBox, SelectorInfo } from './types.js';
+import { isRedacted, type RedactionOptions } from './redaction.js';
 
 const MAX_DEPTH = 6;
 const MAX_TEXT = 120;
@@ -65,14 +66,18 @@ function nearestAttr(el: Element, selector: string, attr: string): string | unde
   return el.closest(selector)?.getAttribute(attr) ?? undefined;
 }
 
-/** DOM-only identity for a selected element. No React-internals coupling. */
-export function extractElementMeta(el: Element): SelectorInfo {
+/**
+ * DOM-only identity for a selected element. No React-internals coupling.
+ * `textSnippet` is blanked when the element is within a redacted region so visible
+ * text from a masked area never travels in the finding metadata (D7).
+ */
+export function extractElementMeta(el: Element, options: RedactionOptions = {}): SelectorInfo {
   return {
     cssPath: computeSelectorPath(el),
     testId: nearestAttr(el, '[data-testid]', 'data-testid'),
     ariaLabel: nearestAttr(el, '[aria-label]', 'aria-label'),
     role: nearestAttr(el, '[role]', 'role'),
-    textSnippet: textSnippet(el),
+    textSnippet: isRedacted(el, options) ? undefined : textSnippet(el),
     tagName: el.tagName.toLowerCase(),
   };
 }

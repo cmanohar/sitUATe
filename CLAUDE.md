@@ -69,10 +69,13 @@ Key invariants that span files:
   (`UatRoot`, `UatToolbar`, `useUatSession`, `UAT_ROOT_ATTR`, the `/uat/feedback` route). They read as
   the **UAT** inside sit·UAT·e, so no rename is planned — **do not bulk-rename** them; it would break
   tests for no benefit. `situate` is the public name; `mountUat` is a deprecated alias.
-- **Redaction is NOT implemented in v0.1.** Screenshots are captured **unredacted** (parity with
-  the original overlay). Always-on masking is the *target* design (Sprint 5). Until then, keep
-  screenshots off or run only against non-sensitive data. Server **always generates screenshot filenames**
-  (`randomUUID().png`) — never trust client-supplied paths.
+- **Redaction is implemented (Sprint 5) — best-effort, always-on.** Before any PNG, `core/redaction.ts`
+  masks `[data-uat-redact]`, all form fields, and host `redactSelectors`, then restores the DOM;
+  redacted `textSnippet` is blanked. It is **best-effort, not a guarantee** — see DESIGN §Redaction
+  residual risk + the host-integration checklist. Screenshots are disable-able per deployment
+  (`situate({ captureScreenshots: false })`). Masked *paint* is verified live (jsdom has no layout
+  engine); the redaction *logic* is unit-tested. Server **always generates screenshot filenames**
+  (`randomUUID().png`) and admin reads reject traversal — never trust client-supplied paths.
 - **Styling is decoupled from any host.** Components emit token classes (e.g. `bg-surface-container`)
   that were the origin app's; the shipped preset/stylesheet back them with CSS variables
   (`--st-*-rgb`, RGB-channel format so opacity modifiers work). Tailwind preflight is disabled and

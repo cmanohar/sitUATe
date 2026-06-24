@@ -20,6 +20,13 @@ export {
   getBoundingBox,
 } from './selector.js';
 export { captureElement, captureViewport } from './capture.js';
+export {
+  redactionSelector,
+  isRedacted,
+  collectRedactionTargets,
+  applyRedaction,
+  type RedactionOptions,
+} from './redaction.js';
 export { getCurrentRoute, installLocationTracking } from './location.js';
 export {
   LOCAL_ENDPOINT,
