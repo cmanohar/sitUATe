@@ -1,6 +1,6 @@
 # Situate — Sprint Plan
 
-**Status:** Sprints 1–2 shipped (extraction + collector backend); Sprints 3–5 planned · **Date:** 2026-06-23 (updated 2026-06-24) · **Design:** [`../DESIGN.md`](../DESIGN.md)
+**Status:** Sprints 1–4 shipped (extraction → collector backend → runtime gating → admin/triage route); Sprint 5 (redaction) remaining · **Date:** 2026-06-23 (updated 2026-06-24) · **Design:** [`../DESIGN.md`](../DESIGN.md)
 
 Two-phase format per house convention: **Phase 1** sizes the backlog and picks sprint shape; **Phase 2** is the per-epic execution deep-dive. IDs: epics `F-EPIC-N`, stories `FS-N`. Effort scale: XS / S / M / L / XL.
 
@@ -10,7 +10,7 @@ Two-phase format per house convention: **Phase 1** sizes the backlog and picks s
 
 ### Where we are
 
-The overlay is **extracted and working** as a monorepo (`core` + `widget` + `server` + `admin` + `examples/vite-react`), and the **collector backend is now built** (Sprint 2, `3297efc`). 101 unit tests pass (32 core / 27 widget / 42 server); the example host proves the widget mounts and styles itself with no host design tokens; `situate report` renders markdown; the Fastify collector persists findings via a pluggable `StorageAdapter` (Files/SQLite) and round-trips a `SituateGatingConfig`. Remaining work (runtime gating, admin route, redaction hardening) is **designed but not built**.
+The monorepo (`core` + `widget` + `server` + `admin` + `examples/vite-react`) now carries everything through the admin route. **136 unit tests pass** (32 core / 43 widget / 48 server / 13 admin). Shipped: the Fastify collector with pluggable `StorageAdapter` (Files/SQLite) (Sprint 2, `3297efc`); runtime gating — `situate(config)` resolves `GET /config/:env` against the collector, fail-closed (Sprint 3, `9d2e369`); and the embeddable `SituateAdmin` triage route — findings table, status lifecycle, screenshot viewing, CSV/markdown export, gating editor, behind a server-enforced admin token (Sprint 4, `aabf4d2`). **Only redaction hardening (Sprint 5) remains** before v1.
 
 ### Candidate items
 
@@ -20,10 +20,10 @@ The backend is the **keystone**: runtime gating, the allowlist, the admin route,
 |---|------|-------|--------|
 | **F1** | Extraction & standalone overlay | Monorepo, core/widget split, styling decoupling, example host, ported tests, CI. | **DONE** |
 | **F2** | Collector backend (Fastify + StorageAdapter) | Ingest + flag/allowlist config + admin query APIs; files + SQLite adapters. | **DONE** (`3297efc`) |
-| **F3** | Runtime gating + auth context | Widget resolves flag/allowlist via `SituateAuthContext`; fail-closed prod. | M |
-| **F4** | Embeddable admin/triage route | Findings table, status/tags, export, flag+allowlist toggle (host auth, `isAdmin`). | L |
-| **F5** | Redaction hardening | Always-on mask of `data-uat-redact` + inputs + configured selectors; disable-screenshots switch; residual-risk docs. | M |
-| **F6** | Feature-request triage model | `SituateFindingStatus` lifecycle, category surfacing, CSV/markdown export. | S |
+| **F3** | Runtime gating + auth context | Widget resolves flag/allowlist via `SituateAuthContext`; fail-closed prod. | **DONE** (`9d2e369`) |
+| **F4** | Embeddable admin/triage route | Findings table, status, export, flag+allowlist toggle (host auth, `isAdmin`). Free-form tags deferred. | **DONE** (`aabf4d2`) |
+| **F5** | Redaction hardening | Always-on mask of `data-uat-redact` + inputs + configured selectors; disable-screenshots switch; residual-risk docs. | M (next) |
+| **F6** | Feature-request triage model | `SituateFindingStatus` lifecycle, category surfacing, CSV/markdown export. | **DONE** (`aabf4d2`, with F4) |
 | **B1** | Postgres adapter | Production-grade store beyond SQLite. | M |
 | **B2** | ~~Internal `Uat*` → `Situate*` rename~~ | Dropped — `Uat*` reads as the **UAT** inside sit·UAT·e; retained intentionally. | — |
 | **B3** | Voting / roadmap board | Post-v1 product surface. | XL |
@@ -34,9 +34,9 @@ The backend is the **keystone**: runtime gating, the allowlist, the admin route,
 
 - **Sprint 1 — Extraction (DONE):** F1.
 - **Sprint 2 — Collector backend (keystone) (DONE — `3297efc`):** F2.
-- **Sprint 3 — Runtime gating + auth (next):** F3.
-- **Sprint 4 — Admin/triage route:** F4 + F6.
-- **Sprint 5 — Redaction hardening:** F5.
+- **Sprint 3 — Runtime gating + auth (DONE — `9d2e369`):** F3.
+- **Sprint 4 — Admin/triage route (DONE — `aabf4d2`):** F4 + F6.
+- **Sprint 5 — Redaction hardening (next):** F5.
 - **Deferred (post-v1 backlog):** B1–B5.
 
 ### Decisions needed before kickoff
@@ -93,39 +93,45 @@ The backend is the **keystone**: runtime gating, the allowlist, the admin route,
 
 ---
 
-### F-EPIC-3 — Runtime gating + auth context
+### F-EPIC-3 — Runtime gating + auth context ✅ Implemented (2026-06-24, `9d2e369`)
 
-**Parent sprint:** Sprint 3 · **Status:** ❌ Not started · **Effort:** M
+**Parent sprint:** Sprint 3 · **Status:** ✅ Shipped · **Effort:** M
 
 **Governing decisions:** D5 (flag + allowlist, fail-closed), D6 (host-supplied `SituateAuthContext`).
 
-**Execution order:**
-- **Step 1 (FS-12):** `situate(config)` accepts `{ collectorUrl, auth: SituateAuthContext, environment }`; thread through `useUatSession`.
-- **Step 2 (FS-13):** On mount, resolve gating from the collector; render only if `enabled` && role/id match. *(test-first: gating-resolution unit tests)*
-- **Step 3 (FS-14):** **Fail-closed** in non-dev environments (error/missing config/no collector → no overlay); dev mode stays on.
-- **Step 4 (FS-15):** Replace the build-time `VITE_SITUATE_ENABLED`-only path with build-flag-OR-runtime-gate; document the migration.
+**Execution order (all done):**
+- **Step 1 (FS-12):** ✅ `situate(config)` accepts `{ collectorUrl, auth: SituateAuthContext, environment }`; threaded through `UatRoot` → `useUatSession` (transport + environment).
+- **Step 2 (FS-13):** ✅ On mount, `useGating` resolves `GET /config/:env`; renders only if `enabled` && (role/id match, or empty allowlist = all authenticated). *(test-first)*
+- **Step 3 (FS-14):** ✅ **Fail-closed** — any error/non-200/unreachable/missing config in non-dev → no overlay; dev mode (no `collectorUrl`) stays on.
+- **Step 4 (FS-15):** ✅ Build-flag-OR-runtime-gate; migration documented in DESIGN §Runtime gating + the example host.
 
-**File checklist:** `packages/widget/src/{index.ts,useUatSession.ts,gating.ts}`, `packages/core/src/transport.ts`, tests under `packages/widget/test/`.
+**Decisions made during build:** the gating/triage contracts were moved into `core/gating.ts` in Sprint 2, so the widget imports `SituateAuthContext` directly from `@situate/core` (no new transport.ts changes needed).
 
-**Exit criteria:** widget renders for an allowlisted user and hides for a non-allowlisted one against a live collector; fail-closed verified.
+**Shipped files:** `packages/widget/src/{gating.ts (new),UatRoot.tsx,useUatSession.ts,index.ts}`; `examples/vite-react/src/main.tsx`; `docs/DESIGN.md`. Tests: `packages/widget/test/{gating,root-gating}.test.*` (+16).
+
+**Exit criteria — all met:** ✅ renders for an allowlisted user, hides for non-allowlisted (component tests against mocked collector + the live `/config/:env` contract from S2); ✅ fail-closed verified (disabled/non-200/unreachable all → hidden).
 
 ---
 
-### F-EPIC-4 — Embeddable admin/triage route
+### F-EPIC-4 — Embeddable admin/triage route ✅ Implemented (2026-06-24, `aabf4d2`)
 
-**Parent sprint:** Sprint 4 · **Status:** ❌ Not started · **Effort:** L (with FS-6)
+**Parent sprint:** Sprint 4 · **Status:** ✅ Shipped · **Effort:** L (with F6)
 
 **Governing decisions:** D4 (embeddable, host auth), D8 (capture + triage).
 
-**Execution order:**
-- **Step 1 (FS-16):** `<SituateAdmin auth={SituateAuthContext} collectorUrl=… />` — gated on `isAdmin`; reusability gate first (extract a `FindingsTable` primitive + a `useFindings` hook before feature views). *(test-first)*
-- **Step 2 (FS-17):** Triage actions — set `SituateFindingStatus`, tags, filter by severity/category/status.
-- **Step 3 (FS-18):** Gating editor — toggle `enabled`, edit `allowedRoles`/`allowedUserIds` (writes config API).
-- **Step 4 (FS-19, = FS-F6):** Export (CSV + markdown via `renderReport`); screenshot viewing by server filename.
+**Execution order (all done):**
+- **Step 1 (FS-16):** ✅ `<SituateAdmin auth collectorUrl adminToken environment />` — gated on `isAdmin`; reusability gate honored — `FindingsTable` primitive + `useFindings` hook + a typed collector `client` extracted before the feature view. *(test-first)*
+- **Step 2 (FS-17):** ✅ Triage actions — set `SituateFindingStatus`; filter by severity/category/status (client-side). **Free-form tags deferred** (not in the data model — would cascade `UatFinding` → adapters → conformance → API; the exit criteria don't require them; `category` surfaced instead).
+- **Step 3 (FS-18):** ✅ Gating editor — toggle `enabled`, edit `allowedRoles`/`allowedUserIds` → `PUT /config/:env`.
+- **Step 4 (FS-19, = F6):** ✅ Export (CSV + markdown via `renderReport`); screenshot viewing — blob-fetched through the adapter, not static file-serving.
 
-**File checklist:** `packages/admin/src/{SituateAdmin.tsx,FindingsTable.tsx,GatingEditor.tsx,useFindings.ts,index.ts}`, tests under `packages/admin/test/`.
+**Decisions made during build:**
+- **Server-side admin auth added** (was an exit-criterion gap — client `isAdmin` is UX only): an `x-situate-admin-token` guard on `GET /findings`, `PUT /findings/:id/status`, `GET /shots/:file`, and `PUT /config/:env`. `GET /config/:env` stays **open** (the widget reads it for gating). Token enforced when set; **must be set in production** (documented residual; collector should also sit behind host auth).
+- **`PUT /findings/:id/status` route added** (deferred from S2) and **`readScreenshot()` added to `StorageAdapter`** + all adapters + conformance (round-trip + path-traversal reject) so screenshots serve through the abstraction, not the FS.
 
-**Exit criteria:** an admin mounts the route in a host, reviews findings, sets statuses, flips the runtime flag, and exports — all via the collector API; non-admins are blocked.
+**Shipped files:** `packages/admin/src/{SituateAdmin,FindingsTable,GatingEditor}.tsx, {useFindings,client,export,index}.ts`; `packages/server/src/{context.ts,routes/{findings,config}.ts,server.ts,main.ts}`, `packages/core/src/storage.ts`; `examples/vite-react/src/App.tsx` (`?admin` mount). Tests under `packages/{admin,server}/test/` (+16).
+
+**Exit criteria — all met:** ✅ an admin mounts the route in the example host (`?admin`); reviews findings, sets statuses, flips the gating flag, exports CSV/markdown — all via the collector API; ✅ non-admins blocked client-side **and** at the API (live-verified: token guard 401→200, status mutation, `image/png` screenshot serving).
 
 ---
 
