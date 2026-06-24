@@ -1,7 +1,7 @@
 {
-  "name": "@cmanohar/flow-core",
+  "name": "@situate/core",
   "version": "0.1.0",
-  "description": "Framework-agnostic logic for Flow feedback: types, capture, selector, transport, report.",
+  "description": "Framework-agnostic logic for Situate feedback: types, capture, selector, transport, report.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -12,14 +12,14 @@
     }
   },
   "bin": {
-    "flow-report": "./dist/cli/report.js"
+    "situate": "./dist/cli/situate.js"
   },
   "files": ["dist"],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
-    "report": "tsx src/cli/report.ts"
+    "report": "tsx src/cli/situate.ts report"
   },
   "dependencies": {
     "html-to-image": "^1.11.13"

@@ -16,7 +16,7 @@ export const SEVERITIES: UatSeverity[] = ['Critical', 'High', 'Medium', 'Low'];
 
 /**
  * Severity → Tailwind token classes. The token names (`primary`,
- * `surface-container`, `on-surface-variant`, …) are defined by Flow's own
+ * `surface-container`, `on-surface-variant`, …) are defined by Situate's own
  * Tailwind preset / CSS-variable theme (see packages/widget), NOT by the host —
  * so the widget renders correctly in any app. Stock Tailwind palette colours
  * (`red-700`, `amber-700`, `yellow-700`, …) come from Tailwind defaults.

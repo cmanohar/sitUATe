@@ -3,7 +3,7 @@ import type { UatFinding, UatSeverity } from './types.js';
 /**
  * Pure findings → markdown renderer. No I/O, no clocks — the date is passed in
  * so output is deterministic (the CLI in `src/cli/report.ts` supplies it).
- * Output matches the SerenityEMR review/feedback doc format.
+ * Output matches a standard review/feedback doc format.
  */
 
 export interface ReportMeta {

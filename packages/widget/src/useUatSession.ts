@@ -9,7 +9,7 @@ import {
   flushQueue,
   submitFinding,
   STORAGE_KEYS,
-} from '@cmanohar/flow-core';
+} from '@situate/core';
 import type {
   BoundingBox,
   TesterRole,
@@ -17,7 +17,7 @@ import type {
   UatEnvironment,
   UatScope,
   UatSeverity,
-} from '@cmanohar/flow-core';
+} from '@situate/core';
 
 export interface SubmitInput {
   scope: UatScope;
@@ -33,7 +33,7 @@ export interface SubmitInput {
  * build; in other contexts it may be undefined — guard so the widget never
  * crashes outside Vite.
  */
-function flowEnv(): Record<string, string | undefined> {
+function situateEnv(): Record<string, string | undefined> {
   try {
     return (
       (import.meta as unknown as { env?: Record<string, string | undefined> }).env ?? {}
@@ -44,11 +44,11 @@ function flowEnv(): Record<string, string | undefined> {
 }
 
 function transportConfig(): TransportConfig {
-  return { collectorUrl: flowEnv().VITE_FLOW_COLLECTOR_URL || undefined };
+  return { collectorUrl: situateEnv().VITE_SITUATE_COLLECTOR_URL || undefined };
 }
 
 function environment(): UatEnvironment {
-  return flowEnv().VITE_FLOW_COLLECTOR_URL ? 'clone' : 'local';
+  return situateEnv().VITE_SITUATE_COLLECTOR_URL ? 'clone' : 'local';
 }
 
 function testerRole(): TesterRole | undefined {
@@ -59,7 +59,7 @@ function testerRole(): TesterRole | undefined {
 /**
  * Session glue: tracks the current route, owns the findings count, and submits
  * findings (capture → transport). Each piece (location, capture, transport,
- * finding) is unit-tested in isolation in @cmanohar/flow-core; this hook just
+ * finding) is unit-tested in isolation in @situate/core; this hook just
  * composes them.
  */
 export function useUatSession() {

@@ -1,7 +1,7 @@
 import { UAT_ROOT_ATTR } from './constants.js';
 
 /**
- * Screenshot capture for the Flow overlay.
+ * Screenshot capture for the Situate overlay.
  *
  * `html-to-image` is used instead of `html2canvas` because modern design tokens
  * are often defined with `oklch()`, which html2canvas's CSS parser mis-renders.
@@ -12,7 +12,7 @@ import { UAT_ROOT_ATTR } from './constants.js';
  *
  * REDACTION (Sprint 5): always-on redaction will run in the `filter`/clone step
  * here — masking `[data-uat-redact]` regions, all form inputs, and
- * host-configured selectors before the PNG is produced. See DESIGN.md §PHI.
+ * host-configured selectors before the PNG is produced. See DESIGN.md §Redaction.
  */
 
 /** Exclude the overlay's own DOM (toolbar, highlight) from captures. */

@@ -1,10 +1,10 @@
 /**
  * A deliberately plain demo page (inline styles only — no Tailwind, no design
  * system). Click the "UAT" launcher bottom-left, then flag any element below or
- * "Note this screen". Saved feedback lands in `flow-sessions/` via the dev
+ * "Note this screen". Saved feedback lands in `.situate/sessions/` via the dev
  * collector plugin.
  *
- * `data-uat-redact` marks a region that Flow's always-on redaction will mask in
+ * `data-uat-redact` marks a region that Situate's always-on redaction will mask in
  * screenshots (Sprint 5) — useful for any field that could carry sensitive data.
  */
 const page: React.CSSProperties = {
@@ -25,7 +25,7 @@ const card: React.CSSProperties = {
 export function App() {
   return (
     <main style={page}>
-      <h1 style={{ fontSize: 28, fontWeight: 700 }}>Flow — example host</h1>
+      <h1 style={{ fontSize: 28, fontWeight: 700 }}>Situate — example host</h1>
       <p style={{ color: '#6b7280', marginTop: 8 }}>
         This app uses no Tailwind and defines no design tokens. The feedback overlay still renders
         correctly because its styles ship with the package.
@@ -42,7 +42,7 @@ export function App() {
       <section style={card} data-uat-redact>
         <h2 style={{ fontSize: 18, fontWeight: 600 }}>Sensitive region (redaction demo)</h2>
         <p style={{ marginTop: 8 }}>
-          This block is marked <code>data-uat-redact</code>. Flow's always-on redaction (Sprint 5)
+          This block is marked <code>data-uat-redact</code>. Situate's always-on redaction (Sprint 5)
           will mask it before any screenshot is produced.
         </p>
       </section>

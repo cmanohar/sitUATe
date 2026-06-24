@@ -1,8 +1,8 @@
 {
-  "name": "@cmanohar/flow-example",
+  "name": "@situate/example",
   "version": "0.1.0",
   "private": true,
-  "description": "Minimal Vite + React host that embeds the Flow overlay — proves the widget mounts and styles itself in an app that defines NO SerenityEMR design tokens.",
+  "description": "Minimal Vite + React host that embeds the Situate overlay — proves the widget mounts and styles itself in an app that defines NO origin-app design tokens.",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,12 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@cmanohar/flow-feedback": "0.1.0",
+    "@situate/widget": "0.1.0",
     "react": "^18.3.0",
     "react-dom": "^18.3.0"
   },
   "devDependencies": {
-    "@cmanohar/flow-server": "0.1.0",
+    "@situate/server": "0.1.0",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.0",

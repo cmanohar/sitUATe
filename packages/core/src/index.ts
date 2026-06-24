@@ -1,7 +1,7 @@
 /**
- * @cmanohar/flow-core — framework-agnostic logic for Flow feedback.
+ * @situate/core — framework-agnostic logic for Situate feedback.
  *
- * Barrel export. Consumed by the React widget (@cmanohar/flow-feedback), the
+ * Barrel export. Consumed by the React widget (@situate/widget), the
  * collector/server, and the report CLI.
  */
 export * from './types.js';

@@ -1,20 +1,20 @@
 #!/usr/bin/env node
 /**
- * Flow collector — standalone ingest service for staging/clone instances.
+ * Situate collector — standalone ingest service for staging/clone instances.
  *
  * Implements the transport contract the overlay POSTs to:
  *   POST /uat/feedback  { finding, pngBase64? }  → 200 { screenshotFile? }
  *   GET  /healthz       → 200
  *
  * Dependency-free (Node http) so it deploys as a container, Cloud Run service,
- * or sidecar. Storage is a local dir (FLOW_STORAGE_DIR) — mount a volume. The
- * report CLI (`flow-report`) reads the same JSONL layout the Vite plugin writes.
+ * or sidecar. Storage is a local dir (SITUATE_STORAGE_DIR) — mount a volume. The
+ * report CLI (`situate report`) reads the same JSONL layout the Vite plugin writes.
  *
  * Config (env):
  *   PORT                default 8080
- *   FLOW_STORAGE_DIR    default ./flow-data
- *   FLOW_ALLOWED_ORIGIN CORS origin for the app (default *)
- *   FLOW_INGEST_TOKEN   if set, require matching `x-flow-token` header
+ *   SITUATE_STORAGE_DIR    default ./.situate/data
+ *   SITUATE_ALLOWED_ORIGIN CORS origin for the app (default *)
+ *   SITUATE_INGEST_TOKEN   if set, require matching `x-situate-token` header
  *
  * SECURITY: this seed is token-gated only. Sprint 2/3 add the pluggable
  * StorageAdapter, and the flag/allowlist API that enforces per-user/role gating
@@ -27,14 +27,14 @@ import { resolve } from 'node:path';
 import { randomUUID } from 'node:crypto';
 
 const PORT = Number(process.env.PORT) || 8080;
-const STORAGE_DIR = process.env.FLOW_STORAGE_DIR || resolve(process.cwd(), 'flow-data');
-const ALLOWED_ORIGIN = process.env.FLOW_ALLOWED_ORIGIN || '*';
-const INGEST_TOKEN = process.env.FLOW_INGEST_TOKEN || '';
+const STORAGE_DIR = process.env.SITUATE_STORAGE_DIR || resolve(process.cwd(), '.situate/data');
+const ALLOWED_ORIGIN = process.env.SITUATE_ALLOWED_ORIGIN || '*';
+const INGEST_TOKEN = process.env.SITUATE_INGEST_TOKEN || '';
 const MAX_BODY = 25 * 1024 * 1024;
 
 function cors(res) {
   res.setHeader('Access-Control-Allow-Origin', ALLOWED_ORIGIN);
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-flow-token');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-situate-token');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
 }
 
@@ -79,7 +79,7 @@ const server = createServer(async (req, res) => {
     json(res, 404, { error: 'not found' });
     return;
   }
-  if (INGEST_TOKEN && req.headers['x-flow-token'] !== INGEST_TOKEN) {
+  if (INGEST_TOKEN && req.headers['x-situate-token'] !== INGEST_TOKEN) {
     json(res, 401, { error: 'unauthorized' });
     return;
   }
@@ -112,5 +112,5 @@ const server = createServer(async (req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`flow-collector listening on :${PORT} → ${STORAGE_DIR}`);
+  console.log(`situate collector listening on :${PORT} → ${STORAGE_DIR}`);
 });

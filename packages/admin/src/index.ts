@@ -1,5 +1,5 @@
 /**
- * @cmanohar/flow-admin — embeddable admin/triage route for Flow.  [Sprint 4 — stub]
+ * @situate/admin — embeddable admin/triage route for Situate.  [Sprint 4 — stub]
  *
  * Will export React components a host mounts at e.g. `/admin/feedback`:
  *   - a findings/feature-request triage table (filter, tag, set status, export)
@@ -11,8 +11,8 @@
  * type-checked anchor.
  */
 
-/** Host-supplied identity. Flow never owns auth. */
-export interface FlowAuthContext {
+/** Host-supplied identity. Situate never owns auth. */
+export interface SituateAuthContext {
   userId: string;
   displayName?: string;
   roles: string[];
@@ -20,7 +20,7 @@ export interface FlowAuthContext {
 }
 
 /** Triage lifecycle for a finding / feature request. */
-export type FlowFindingStatus =
+export type SituateFindingStatus =
   | 'new'
   | 'triaged'
   | 'planned'
@@ -30,7 +30,7 @@ export type FlowFindingStatus =
   | 'duplicate';
 
 /** Runtime gating config served by the collector and edited in the admin route. */
-export interface FlowGatingConfig {
+export interface SituateGatingConfig {
   /** Master on/off for this environment. */
   enabled: boolean;
   /** Roles permitted to see the widget when enabled (empty = all authenticated). */
@@ -40,4 +40,4 @@ export interface FlowGatingConfig {
 }
 
 /** Placeholder until the components land in Sprint 4. */
-export const FLOW_ADMIN_STATUS = 'planned' as const;
+export const SITUATE_ADMIN_STATUS = 'planned' as const;

@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
-import { UAT_Z_INDEX } from '@cmanohar/flow-core';
-import type { BoundingBox, UatScope } from '@cmanohar/flow-core';
+import { UAT_Z_INDEX } from '@situate/core';
+import type { BoundingBox, UatScope } from '@situate/core';
 import { UatToolbar } from './UatToolbar.js';
 import { ElementPicker } from './ElementPicker.js';
 import { CommentPopover, type CommentDraft } from './CommentPopover.js';

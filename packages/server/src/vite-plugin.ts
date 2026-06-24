@@ -6,20 +6,20 @@ import type { Plugin } from 'vite';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 
 /**
- * Local-dev bridge for the Flow overlay. Adds a `POST /__uat/feedback` endpoint
+ * Local-dev bridge for the Situate overlay. Adds a `POST /__uat/feedback` endpoint
  * to the Vite dev server that writes findings + screenshots to a gitignored
- * `flow-sessions/<date>-<user>/` dir under the consuming app's project root.
+ * `.situate/sessions/<date>-<user>/` dir under the consuming app's project root.
  * This is the LOCAL fallback only — staging/clone instances POST to the remote
  * collector (`collector.mjs`, or the Fastify service from Sprint 2).
  *
  * Register behind your own enable flag, e.g.:
- *   plugins: [react(), ...(flowEnabled ? [flowVitePlugin()] : [])]
+ *   plugins: [react(), ...(situateEnabled ? [situateVitePlugin()] : [])]
  */
 
 const ENDPOINT = '/__uat/feedback';
 const MAX_BODY = 25 * 1024 * 1024; // 25 MB — screenshots can be large
 
-export interface FlowVitePluginOptions {
+export interface SituateVitePluginOptions {
   /** Project root to write sessions under. Defaults to the Vite config root / cwd. */
   storageRoot?: string;
 }
@@ -52,7 +52,7 @@ function isoDate(timestamp?: string): string {
 
 /**
  * Slugified `git config user.name`, used to make session dirs attributable to a
- * tester (`flow-sessions/<date>-<user>/`). Cached — git user is stable for the
+ * tester (`.situate/sessions/<date>-<user>/`). Cached — git user is stable for the
  * session and we don't want to shell out on every finding POST. Falls back to
  * `'unknown'` so the dev server never breaks over this.
  */
@@ -69,10 +69,10 @@ function gitUser(cwd: string): string {
   return cachedUser;
 }
 
-export function flowVitePlugin(options: FlowVitePluginOptions = {}): Plugin {
+export function situateVitePlugin(options: SituateVitePluginOptions = {}): Plugin {
   let root = options.storageRoot ?? process.cwd();
   return {
-    name: 'flow-feedback-local',
+    name: 'situate-feedback-local',
     apply: 'serve', // dev server only
     configResolved(config) {
       if (!options.storageRoot) root = config.root;
@@ -94,7 +94,7 @@ export function flowVitePlugin(options: FlowVitePluginOptions = {}): Plugin {
           }
 
           const date = isoDate(finding.timestamp);
-          const sessionDir = resolve(root, 'flow-sessions', `${date}-${gitUser(root)}`);
+          const sessionDir = resolve(root, '.situate/sessions', `${date}-${gitUser(root)}`);
           mkdirSync(resolve(sessionDir, 'shots'), { recursive: true });
 
           let screenshotFile: string | undefined;

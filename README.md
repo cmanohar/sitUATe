@@ -1,13 +1,13 @@
-# Flow
+# Situate
 
 An **embeddable in-app feedback + UAT overlay** for any Vite/React app. Testers and end-users
 select an on-screen element (or note the whole screen), add a graded comment and a private,
-**PHI-redacted** screenshot — which becomes structured findings, a markdown report, and an AI-fix
+**redacted** screenshot — which becomes structured findings, a markdown report, and an AI-fix
 worklist.
 
-Flow began as the dev-only UAT overlay inside [SerenityEMR](../DTP_HealthRecord) and is being spun
+Situate began as an internal dev-only UAT overlay and is being spun
 out into a reusable, runtime-toggleable platform. See [`docs/DESIGN.md`](docs/DESIGN.md) for the full
-design and [`docs/plans/2026-06-23-flow-sprint-plan.md`](docs/plans/2026-06-23-flow-sprint-plan.md)
+design and [`docs/plans/2026-06-23-situate-sprint-plan.md`](docs/plans/2026-06-23-situate-sprint-plan.md)
 for the build-out roadmap.
 
 ## What's here (v0.1 — extraction milestone)
@@ -18,15 +18,15 @@ redaction hardening) that follow.
 
 ```
 packages/
-  core/      @cmanohar/flow-core      — framework-agnostic logic (types, capture, selector, report, transport)
-  widget/    @cmanohar/flow-feedback  — the embeddable React overlay (peer-deps React)
-  server/    @cmanohar/flow-server    — collector seed (Vite dev plugin + standalone ingest) [Sprint 2 → Fastify]
-  admin/     @cmanohar/flow-admin     — embeddable admin/triage route [Sprint 4 — stub]
+  core/      @situate/core      — framework-agnostic logic (types, capture, selector, report, transport)
+  widget/    @situate/widget  — the embeddable React overlay (peer-deps React)
+  server/    @situate/server    — collector seed (Vite dev plugin + standalone ingest) [Sprint 2 → Fastify]
+  admin/     @situate/admin     — embeddable admin/triage route [Sprint 4 — stub]
 examples/
   vite-react/                         — minimal host proving the widget embeds + styles standalone
 docs/
   DESIGN.md                           — platform design
-  plans/2026-06-23-flow-sprint-plan.md
+  plans/2026-06-23-situate-sprint-plan.md
 ```
 
 ## Quick start
@@ -41,19 +41,19 @@ npm run dev:example         # run the example host with the overlay mounted
 ## Embedding in your app (preview API)
 
 ```tsx
-import { mountFlow } from '@cmanohar/flow-feedback';
-import '@cmanohar/flow-feedback/styles.css'; // self-contained, theme-able via CSS variables
+import { situate } from '@situate/widget';
+import '@situate/widget/styles.css'; // self-contained, theme-able via CSS variables
 
-if (import.meta.env.VITE_FLOW_ENABLED === 'true') {
-  mountFlow();
+if (import.meta.env.VITE_SITUATE_ENABLED === 'true') {
+  situate();
 }
 ```
 
-The widget ships a self-contained stylesheet driven by CSS variables (`--flow-primary-rgb`, etc.), so
-it renders correctly in **any** host without requiring SerenityEMR's design tokens. Override the
-variables to theme it. Tailwind hosts can instead use the shipped preset (`@cmanohar/flow-feedback/preset`).
+The widget ships a self-contained stylesheet driven by CSS variables (`--st-primary-rgb`, etc.), so
+it renders correctly in **any** host without requiring the origin app's design tokens. Override the
+variables to theme it. Tailwind hosts can instead use the shipped preset (`@situate/widget/preset`).
 
 ## Heritage
 
-Extracted from `mvp/src/uat/` in SerenityEMR. The internal `Uat*` identifiers are retained for this
-milestone and renamed to `Flow*` in a later sprint (see the sprint plan).
+Extracted from an internal dev-only UAT overlay. The internal `Uat*` identifiers are retained
+deliberately — they read as the **UAT** inside "sit·UAT·e", so no rename is planned.

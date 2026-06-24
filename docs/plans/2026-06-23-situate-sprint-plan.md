@@ -1,4 +1,4 @@
-# Flow — Sprint Plan
+# Situate — Sprint Plan
 
 **Status:** Sprint 1 shipped (extraction); Sprints 2–5 planned · **Date:** 2026-06-23 · **Design:** [`../DESIGN.md`](../DESIGN.md)
 
@@ -10,7 +10,7 @@ Two-phase format per house convention: **Phase 1** sizes the backlog and picks s
 
 ### Where we are
 
-The overlay is **extracted and working** as a monorepo (`core` + `widget` + `server` + `admin` + `examples/vite-react`). 59 unit tests pass; the example host proves the widget mounts and styles itself with no host design tokens; `flow-report` renders markdown. Everything beyond extraction (backend, runtime gating, admin route, redaction hardening) is **designed but not built**.
+The overlay is **extracted and working** as a monorepo (`core` + `widget` + `server` + `admin` + `examples/vite-react`). 59 unit tests pass; the example host proves the widget mounts and styles itself with no host design tokens; `situate report` renders markdown. Everything beyond extraction (backend, runtime gating, admin route, redaction hardening) is **designed but not built**.
 
 ### Candidate items
 
@@ -20,12 +20,12 @@ The backend is the **keystone**: runtime gating, the allowlist, the admin route,
 |---|------|-------|--------|
 | **F1** | Extraction & standalone overlay | Monorepo, core/widget split, styling decoupling, example host, ported tests, CI. | **DONE** |
 | **F2** | Collector backend (Fastify + StorageAdapter) | Ingest + flag/allowlist config + admin query APIs; files + SQLite adapters. | L |
-| **F3** | Runtime gating + auth context | Widget resolves flag/allowlist via `FlowAuthContext`; fail-closed prod. | M |
+| **F3** | Runtime gating + auth context | Widget resolves flag/allowlist via `SituateAuthContext`; fail-closed prod. | M |
 | **F4** | Embeddable admin/triage route | Findings table, status/tags, export, flag+allowlist toggle (host auth, `isAdmin`). | L |
 | **F5** | Redaction hardening | Always-on mask of `data-uat-redact` + inputs + configured selectors; disable-screenshots switch; residual-risk docs. | M |
-| **F6** | Feature-request triage model | `FlowFindingStatus` lifecycle, category surfacing, CSV/markdown export. | S |
+| **F6** | Feature-request triage model | `SituateFindingStatus` lifecycle, category surfacing, CSV/markdown export. | S |
 | **B1** | Postgres adapter | Production-grade store beyond SQLite. | M |
-| **B2** | Internal `Uat*` → `Flow*` rename | Cosmetic; deferred to keep extraction faithful. | S |
+| **B2** | ~~Internal `Uat*` → `Situate*` rename~~ | Dropped — `Uat*` reads as the **UAT** inside sit·UAT·e; retained intentionally. | — |
 | **B3** | Voting / roadmap board | Post-v1 product surface. | XL |
 | **B4** | Framework-agnostic (non-React) widget | `core` is already React-free to enable this. | L |
 | **B5** | Notifications hook (submitter status updates) | Email/webhook on status change. | M |
@@ -44,7 +44,7 @@ The backend is the **keystone**: runtime gating, the allowlist, the admin route,
 - [ ] Confirm Fastify (vs. keeping the dependency-free `http` collector) for F2 — DESIGN D9 recommends Fastify.
 - [ ] Confirm default self-host store: SQLite for v1, Postgres deferred to B1.
 - [ ] Confirm CI provider for the new repo (lint + build + test on PR).
-- [ ] Confirm npm publish scope/visibility (`@cmanohar/*`, public or private registry).
+- [ ] Confirm npm publish scope/visibility (`@situate/*`, public or private registry).
 
 ---
 
@@ -52,7 +52,7 @@ The backend is the **keystone**: runtime gating, the allowlist, the admin route,
 
 ### F-EPIC-1 — Extraction & standalone overlay ✅ Implemented (2026-06-23)
 
-**Outcome:** a reusable, embeddable overlay extracted from SerenityEMR, proven in a token-free host.
+**Outcome:** a reusable, embeddable overlay extracted from an internal app, proven in a token-free host.
 
 **Stories:** FS-1 monorepo scaffold · FS-2 core/widget split · FS-3 styling decoupling (preset + self-contained CSS, scoped `--tw-*`, no global leak) · FS-4 ported tests (59 green) · FS-5 example host + live verification · FS-6 report CLI.
 
@@ -61,7 +61,7 @@ The backend is the **keystone**: runtime gating, the allowlist, the admin route,
 | Area | Files |
 |------|------|
 | core | `packages/core/src/{types,constants,finding,selector,capture,location,transport,report}.ts`, `cli/report.ts`, `index.ts` |
-| widget | `packages/widget/src/{UatRoot,UatToolbar,ElementPicker,CommentPopover}.tsx`, `{useDraggable,useUatSession}.ts`, `theme.css`, `flow-preset.cjs`, `index.ts` |
+| widget | `packages/widget/src/{UatRoot,UatToolbar,ElementPicker,CommentPopover}.tsx`, `{useDraggable,useUatSession}.ts`, `theme.css`, `situate-preset.cjs`, `index.ts` |
 | server | `packages/server/src/{vite-plugin.ts,collector.mjs,index.ts}` |
 | admin | `packages/admin/src/index.ts` (contracts only) |
 | example | `examples/vite-react/{src,vite.config.ts,index.html}` |
@@ -80,11 +80,11 @@ The backend is the **keystone**: runtime gating, the allowlist, the admin route,
 - **Step 2 (FS-8):** `FilesAdapter` (parity with current JSONL+shots layout) + `SqliteAdapter`.
 - **Step 3 (FS-9):** Fastify service exposing `POST /uat/feedback` (ingest), `GET/PUT /config/:env` (flag+allowlist), `GET /findings` (admin query) — preserving the existing ingest contract.
 - **Step 4 (FS-10):** Screenshot storage via `saveScreenshot` (server-generated names); 25 MB cap; CORS + ingest-token parity with `collector.mjs`.
-- **Step 5 (FS-11):** Docker image + `flow-collector` bin; healthcheck; config via env.
+- **Step 5 (FS-11):** Container image + `npm run collect` entrypoint; healthcheck; config via env.
 
 **File checklist:** `packages/server/src/{server.ts,adapters/{files,sqlite}.ts,routes/*.ts}`, `packages/core/src/storage.ts`, tests under `packages/server/test/`.
 
-**Exit criteria:** ingest persists via SQLite; config API round-trips a `FlowGatingConfig`; `flow-report` reads the same data; adapter tests green.
+**Exit criteria:** ingest persists via SQLite; config API round-trips a `SituateGatingConfig`; `situate report` reads the same data; adapter tests green.
 
 ---
 
@@ -92,13 +92,13 @@ The backend is the **keystone**: runtime gating, the allowlist, the admin route,
 
 **Parent sprint:** Sprint 3 · **Status:** ❌ Not started · **Effort:** M
 
-**Governing decisions:** D5 (flag + allowlist, fail-closed), D6 (host-supplied `FlowAuthContext`).
+**Governing decisions:** D5 (flag + allowlist, fail-closed), D6 (host-supplied `SituateAuthContext`).
 
 **Execution order:**
-- **Step 1 (FS-12):** `mountFlow(config)` accepts `{ collectorUrl, auth: FlowAuthContext, environment }`; thread through `useUatSession`.
+- **Step 1 (FS-12):** `situate(config)` accepts `{ collectorUrl, auth: SituateAuthContext, environment }`; thread through `useUatSession`.
 - **Step 2 (FS-13):** On mount, resolve gating from the collector; render only if `enabled` && role/id match. *(test-first: gating-resolution unit tests)*
 - **Step 3 (FS-14):** **Fail-closed** in non-dev environments (error/missing config/no collector → no overlay); dev mode stays on.
-- **Step 4 (FS-15):** Replace the build-time `VITE_FLOW_ENABLED`-only path with build-flag-OR-runtime-gate; document the migration.
+- **Step 4 (FS-15):** Replace the build-time `VITE_SITUATE_ENABLED`-only path with build-flag-OR-runtime-gate; document the migration.
 
 **File checklist:** `packages/widget/src/{index.ts,useUatSession.ts,gating.ts}`, `packages/core/src/transport.ts`, tests under `packages/widget/test/`.
 
@@ -113,12 +113,12 @@ The backend is the **keystone**: runtime gating, the allowlist, the admin route,
 **Governing decisions:** D4 (embeddable, host auth), D8 (capture + triage).
 
 **Execution order:**
-- **Step 1 (FS-16):** `<FlowAdmin auth={FlowAuthContext} collectorUrl=… />` — gated on `isAdmin`; reusability gate first (extract a `FindingsTable` primitive + a `useFindings` hook before feature views). *(test-first)*
-- **Step 2 (FS-17):** Triage actions — set `FlowFindingStatus`, tags, filter by severity/category/status.
+- **Step 1 (FS-16):** `<SituateAdmin auth={SituateAuthContext} collectorUrl=… />` — gated on `isAdmin`; reusability gate first (extract a `FindingsTable` primitive + a `useFindings` hook before feature views). *(test-first)*
+- **Step 2 (FS-17):** Triage actions — set `SituateFindingStatus`, tags, filter by severity/category/status.
 - **Step 3 (FS-18):** Gating editor — toggle `enabled`, edit `allowedRoles`/`allowedUserIds` (writes config API).
 - **Step 4 (FS-19, = FS-F6):** Export (CSV + markdown via `renderReport`); screenshot viewing by server filename.
 
-**File checklist:** `packages/admin/src/{FlowAdmin.tsx,FindingsTable.tsx,GatingEditor.tsx,useFindings.ts,index.ts}`, tests under `packages/admin/test/`.
+**File checklist:** `packages/admin/src/{SituateAdmin.tsx,FindingsTable.tsx,GatingEditor.tsx,useFindings.ts,index.ts}`, tests under `packages/admin/test/`.
 
 **Exit criteria:** an admin mounts the route in a host, reviews findings, sets statuses, flips the runtime flag, and exports — all via the collector API; non-admins are blocked.
 
@@ -133,9 +133,9 @@ The backend is the **keystone**: runtime gating, the allowlist, the admin route,
 **Execution order:**
 - **Step 1 (FS-20):** Redaction pass in `core/capture` — mask `[data-uat-redact]`, all inputs, and `options.redactSelectors[]` before PNG; blank redacted `textSnippet`. *(test-first against a DOM fixture)*
 - **Step 2 (FS-21):** `captureScreenshots: false` deployment switch (metadata-only feedback).
-- **Step 3 (FS-22):** Document residual risk + host responsibilities; add a host-integration checklist (EHR note: hazard-log entry required before enabling screenshots in clinical prod).
+- **Step 3 (FS-22):** Document residual risk + host responsibilities; add a host-integration checklist (note: add the appropriate safeguard before enabling screenshots in production).
 
-**File checklist:** `packages/core/src/{capture.ts,redaction.ts}`, `packages/widget/src/index.ts` (options), `docs/DESIGN.md` (§PHI), tests under `packages/core/test/`.
+**File checklist:** `packages/core/src/{capture.ts,redaction.ts}`, `packages/widget/src/index.ts` (options), `docs/DESIGN.md` (§Redaction), tests under `packages/core/test/`.
 
 **Exit criteria:** marked regions + inputs are masked in a live capture; screenshots can be disabled per deployment; residual-risk + checklist documented.
 
@@ -146,7 +146,7 @@ The backend is the **keystone**: runtime gating, the allowlist, the admin route,
 | Item | Reason deferred | Revisit when |
 |------|-----------------|--------------|
 | B1 Postgres adapter | SQLite covers v1 self-host | First multi-tenant / HA deployment |
-| B2 `Uat*` → `Flow*` rename | Keep extraction faithful + tests stable | After Sprint 5, as a dedicated rename PR |
+| B2 `Uat*` → `Situate*` rename | Keep extraction faithful + tests stable | After Sprint 5, as a dedicated rename PR |
 | B3 Voting / roadmap board | Out of v1 scope (D8) | When feature-request volume warrants prioritisation UX |
 | B4 Framework-agnostic widget | React covers current consumers | First non-React host asks to embed |
 | B5 Notifications hook | Not needed for internal triage | When external submitters need status updates |

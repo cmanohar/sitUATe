@@ -1,7 +1,7 @@
 {
-  "name": "@cmanohar/flow-admin",
+  "name": "@situate/admin",
   "version": "0.1.0",
-  "description": "Embeddable admin/triage route for Flow (review findings, set status, toggle runtime flag). Sprint 4 — stub.",
+  "description": "Embeddable admin/triage route for Situate (review findings, set status, toggle runtime flag). Sprint 4 — stub.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -20,7 +20,7 @@
     "react": ">=18"
   },
   "dependencies": {
-    "@cmanohar/flow-core": "0.1.0"
+    "@situate/core": "0.1.0"
   },
   "devDependencies": {
     "typescript": "^5.7.0"

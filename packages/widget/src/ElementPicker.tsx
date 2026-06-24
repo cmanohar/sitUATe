@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { UAT_ROOT_ATTR, UAT_Z_INDEX, getBoundingBox } from '@cmanohar/flow-core';
-import type { BoundingBox } from '@cmanohar/flow-core';
+import { UAT_ROOT_ATTR, UAT_Z_INDEX, getBoundingBox } from '@situate/core';
+import type { BoundingBox } from '@situate/core';
 
 interface ElementPickerProps {
   active: boolean;

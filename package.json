@@ -1,8 +1,8 @@
 {
-  "name": "flow",
+  "name": "situate",
   "version": "0.1.0",
   "private": true,
-  "description": "Flow — an embeddable in-app feedback + UAT overlay platform (extracted from SerenityEMR).",
+  "description": "Situate — an embeddable in-app feedback + UAT overlay platform (extracted from an internal app).",
   "type": "module",
   "workspaces": [
     "packages/core",
@@ -12,11 +12,11 @@
     "examples/vite-react"
   ],
   "scripts": {
-    "build": "npm run build -w @cmanohar/flow-core && npm run build -w @cmanohar/flow-feedback && npm run build -w @cmanohar/flow-server && npm run build -w @cmanohar/flow-admin",
-    "test": "npm run test -w @cmanohar/flow-core && npm run test -w @cmanohar/flow-feedback",
+    "build": "npm run build -w @situate/core && npm run build -w @situate/widget && npm run build -w @situate/server && npm run build -w @situate/admin",
+    "test": "npm run test -w @situate/core && npm run test -w @situate/widget",
     "typecheck": "npm run typecheck --workspaces --if-present",
-    "dev:example": "npm run dev -w @cmanohar/flow-example",
-    "report": "npm run report -w @cmanohar/flow-core"
+    "dev:example": "npm run dev -w @situate/example",
+    "report": "npm run report -w @situate/core"
   },
   "engines": {
     "node": ">=18"

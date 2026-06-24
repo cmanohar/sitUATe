@@ -1,5 +1,5 @@
 import { MessageSquarePlus } from 'lucide-react';
-import { UAT_Z_INDEX } from '@cmanohar/flow-core';
+import { UAT_Z_INDEX } from '@situate/core';
 import { useDraggable } from './useDraggable.js';
 
 interface UatToolbarProps {

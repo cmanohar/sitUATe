@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { GripVertical } from 'lucide-react';
-import { SEVERITIES, SEVERITY_CLASSES, UAT_Z_INDEX } from '@cmanohar/flow-core';
-import type { BoundingBox, UatCategory, UatSeverity } from '@cmanohar/flow-core';
+import { SEVERITIES, SEVERITY_CLASSES, UAT_Z_INDEX } from '@situate/core';
+import type { BoundingBox, UatCategory, UatSeverity } from '@situate/core';
 import { useDraggable } from './useDraggable.js';
 
 export interface CommentDraft {

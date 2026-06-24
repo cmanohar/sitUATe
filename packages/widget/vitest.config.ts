@@ -5,7 +5,7 @@ export default defineConfig({
   resolve: {
     alias: {
       // Resolve the core package to its source so widget tests don't require a build.
-      '@cmanohar/flow-core': fileURLToPath(new URL('../core/src/index.ts', import.meta.url)),
+      '@situate/core': fileURLToPath(new URL('../core/src/index.ts', import.meta.url)),
     },
   },
   test: {

@@ -1,7 +1,7 @@
 {
-  "name": "@cmanohar/flow-server",
+  "name": "@situate/server",
   "version": "0.1.0",
-  "description": "Flow collector seed: Vite dev plugin + standalone ingest service. Sprint 2 evolves this into a Fastify service with pluggable storage.",
+  "description": "Situate collector seed: Vite dev plugin + standalone ingest service. Sprint 2 evolves this into a Fastify service with pluggable storage.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -12,14 +12,11 @@
     },
     "./collector": "./src/collector.mjs"
   },
-  "bin": {
-    "flow-collector": "./src/collector.mjs"
-  },
   "files": ["dist", "src/collector.mjs"],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "collector": "node src/collector.mjs"
+    "collect": "node src/collector.mjs"
   },
   "peerDependencies": {
     "vite": ">=5"

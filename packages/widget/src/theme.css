@@ -1,23 +1,23 @@
 /*
- * Flow self-contained theme.
+ * Situate self-contained theme.
  *
- * Import once in your app:  import '@cmanohar/flow-feedback/styles.css';
+ * Import once in your app:  import '@situate/widget/styles.css';
  *
  * The widget renders correctly in any host because these token defaults are
  * shipped here, NOT inherited from the host. To re-theme the overlay, redefine
- * any of the `--flow-*-rgb` variables in your own `:root` (values are
+ * any of the `--st-*-rgb` variables in your own `:root` (values are
  * space-separated RGB channels so Tailwind opacity modifiers keep working).
  */
 :root {
-  --flow-primary-rgb: 79 70 229; /* indigo-600 */
-  --flow-on-primary-rgb: 255 255 255;
-  --flow-surface-rgb: 255 255 255;
-  --flow-surface-container-lowest-rgb: 255 255 255;
-  --flow-surface-container-rgb: 243 244 246; /* gray-100 */
-  --flow-surface-container-high-rgb: 229 231 235; /* gray-200 */
-  --flow-on-surface-rgb: 17 24 39; /* gray-900 */
-  --flow-on-surface-variant-rgb: 107 114 128; /* gray-500 */
-  --flow-outline-variant-rgb: 209 213 219; /* gray-300 */
+  --st-primary-rgb: 79 70 229; /* indigo-600 */
+  --st-on-primary-rgb: 255 255 255;
+  --st-surface-rgb: 255 255 255;
+  --st-surface-container-lowest-rgb: 255 255 255;
+  --st-surface-container-rgb: 243 244 246; /* gray-100 */
+  --st-surface-container-high-rgb: 229 231 235; /* gray-200 */
+  --st-on-surface-rgb: 17 24 39; /* gray-900 */
+  --st-on-surface-variant-rgb: 107 114 128; /* gray-500 */
+  --st-outline-variant-rgb: 209 213 219; /* gray-300 */
 }
 
 /*

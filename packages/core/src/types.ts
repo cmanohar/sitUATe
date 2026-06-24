@@ -1,12 +1,13 @@
 /**
- * Flow feedback — shared types.
+ * Situate feedback — shared types.
  *
- * Framework-agnostic. Carries no clinical/PHI semantics of its own — when Flow
- * is embedded in a healthcare app, PHI protection is the host's responsibility
- * plus Flow's redaction layer (see the capture module + DESIGN.md).
+ * Framework-agnostic. Carries no domain semantics of its own — when Situate
+ * is embedded in a digital health application, sensitive-data protection is the host's
+ * responsibility plus Situate's redaction layer (see the capture module + DESIGN.md).
  *
- * Extracted from SerenityEMR `mvp/src/uat/types.ts`. The `Uat*` names are
- * retained for the extraction milestone and renamed to `Flow*` in a later sprint.
+ * Extracted from an internal UAT overlay. The `Uat*` names are
+ * retained deliberately — they read as the "UAT" inside "sit·UAT·e", so no
+ * rename is planned.
  */
 
 export type UatCategory = 'bug' | 'change' | 'question';

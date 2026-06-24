@@ -1,5 +1,5 @@
 /**
- * SPA-aware route tracking for the Flow overlay.
+ * SPA-aware route tracking for the Situate overlay.
  *
  * The overlay mounts globally (a sibling of the host's router), so it cannot use
  * react-router's `useLocation()`. SPA routers navigate via `history.pushState`,

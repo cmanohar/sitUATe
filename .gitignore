@@ -3,8 +3,7 @@ dist/
 *.tsbuildinfo
 
 # Local feedback session data (findings + screenshots) — never commit
-flow-sessions/
-flow-data/
+.situate/
 
 # Editor / OS
 .DS_Store
